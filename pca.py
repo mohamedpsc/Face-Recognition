@@ -1,5 +1,4 @@
 import numpy
-import pickle
 
 
 def deviationMatrix(matrix):
@@ -20,7 +19,7 @@ def pca(matrix, threshold):
 
 if __name__ == '__main__':
     import database_reader as reader
-    training, test = reader.load()
-    eigValues, eigVectors = pca(training, 0.1)
-    print('Values', eigValues, 'Vectors', eigVectors)
-    # pickle.dump([eigValues, eigVectors], open('log.txt', 'wb'))
+    train_data, test_data, train_labels, test_labels = reader.load()
+    eigValues, eigVectors = pca(train_data, 0.1)
+    print('Values\n', eigValues)
+    print('Vectors\n', eigVectors)
