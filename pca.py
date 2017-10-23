@@ -10,12 +10,22 @@ def covariance(matrix):
     covMatrix = matrix.getT() * matrix
     return covMatrix / matrix.shape[0]
 
-def pca(matrix, threshold):
-    meanMatrix = numpy.mean(matrix, axis=0)
-    devMatrix = deviationMatrix(matrix)
-    covMatrix = covariance(devMatrix)
-    eigValues, eigVectors = numpy.linalg.eigh(covMatrix)
-    return eigValues, eigVectors
+def pca(matrix, threshold, eigValues=None, eigVectors=None):
+    # eigen Values and Vectors not calculated
+    if eigValues is None or eigVectors is None:
+        meanMatrix = numpy.mean(matrix, axis=0)
+        devMatrix = deviationMatrix(matrix)
+        covMatrix = covariance(devMatrix)
+        eigValues, eigVectors = numpy.linalg.eigh(covMatrix)
+    sum = eigValues.sum()
+    num = 0
+    count = 0
+    while num/sum < threshold:
+        num += eigValues[count]
+        count += 1
+    # Projecting Data on new Dimensions
+    newData = matrix * eigVectors[:, count-1].T
+    return newData
 
 if __name__ == '__main__':
     import database_reader as reader
