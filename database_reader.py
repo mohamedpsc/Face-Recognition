@@ -34,4 +34,4 @@ def load(dir='orl_faces', train_count=7, test_count=3):
         return numpy.asmatrix(training_dataset), numpy.asmatrix(test_dataset), numpy.asmatrix(training_label), numpy.asmatrix(test_label)
 
 if __name__ == '__main__':
-    training, test = load()
+    train_data, test_data, train_labels, test_labels = load()
