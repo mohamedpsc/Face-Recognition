@@ -21,12 +21,12 @@ def pca(matrix, threshold, eigValues=None, eigVectors=None):
         numpy.save('eigVectors', eigVectors)
     sum = eigValues.sum()
     num = 0
-    count = 0
+    count = eigValues.shape[1]-1
     while num/sum < threshold:
         num += eigValues[0, count]
-        count += 1
+        count -= 1
     # Projecting Data on new Dimensions
-    newData = matrix * eigVectors[:, count-1].T
+    newData = matrix * eigVectors[:, count:eigValues.shape[1]]
     return newData
 
 if __name__ == '__main__':
