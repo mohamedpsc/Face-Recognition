@@ -17,11 +17,13 @@ def pca(matrix, threshold, eigValues=None, eigVectors=None):
         devMatrix = deviationMatrix(matrix)
         covMatrix = covariance(devMatrix)
         eigValues, eigVectors = numpy.linalg.eigh(covMatrix)
+        numpy.save('eigValues', eigValues)
+        numpy.save('eigVectors', eigVectors)
     sum = eigValues.sum()
     num = 0
     count = 0
     while num/sum < threshold:
-        num += eigValues[count]
+        num += eigValues[0, count]
         count += 1
     # Projecting Data on new Dimensions
     newData = matrix * eigVectors[:, count-1].T
@@ -30,6 +32,12 @@ def pca(matrix, threshold, eigValues=None, eigVectors=None):
 if __name__ == '__main__':
     import database_reader as reader
     train_data, test_data, train_labels, test_labels = reader.load()
-    eigValues, eigVectors = pca(train_data, 0.1)
-    print('Values\n', eigValues)
-    print('Vectors\n', eigVectors)
+    try:
+        eigValues = numpy.matrix(numpy.load('eigValues.npy'))
+        eigVectors = numpy.matrix(numpy.load('eigVectors.npy'))
+    except Exception as e:
+        print('No Eigen Values or Vectors Found, Recomputing...')
+        new_data = pca(train_data, 0.8)
+    else:
+        new_data = pca(train_data, 0.8, eigValues, eigVectors)
+    print(new_data)
