@@ -2,17 +2,20 @@ import os
 from scipy.misc import imread
 import numpy
 
-
-'''This Function Load Images dataset from a given directory into ndarray
-Parameters:
------------
-    dir {string}: Path to dataset
-    train_count {int}: Number of images to load for training 
-    test_count {int}: Number of images to load for testing
-Return:
-    training_dataset{ List[ndarray] }:
-    test_dataset{ List[ndarray] }:'''
 def load(dir='orl_faces', train_count=7, test_count=3):
+    '''This Function Load Images dataset from a given directory into numpy.matrix\n
+        Args:
+        -----
+        :param dir: Path to dataset
+        :type dir: String
+        :param train_count: Number of images to load for training
+        :type train_count: Int
+        :param test_count: Number of images to load for testing
+        :type test_count: Int
+        Return:
+        -------
+        :return: training_dataset, test_dataset, training_labels, test_labels
+        :rtype:  numpy.matrix, numpy.matrix, numpy.matrix, numpy.matrix'''
     try:
         training_dataset = []
         test_dataset = []
