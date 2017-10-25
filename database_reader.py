@@ -12,7 +12,7 @@ Parameters:
 Return:
     training_dataset{ List[ndarray] }:
     test_dataset{ List[ndarray] }:'''
-def load(dir='orl_faces', train_count=7, test_count=3):
+def load(dir='orl_faces', train_count=3, test_count=7):
     try:
         training_dataset = []
         test_dataset = []
