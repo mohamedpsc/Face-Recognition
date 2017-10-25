@@ -1,30 +1,38 @@
 import os
 from scipy.misc import imread
 import numpy
+import re
 
-def load(dir='orl_faces', train_count=7, test_count=3):
-    '''This Function Load Images dataset from a given directory into numpy.matrix\n
-        Args:
-        -----
-        :param dir: Path to dataset
-        :type dir: String
-        :param train_count: Number of images to load for training
-        :type train_count: Int
-        :param test_count: Number of images to load for testing
-        :type test_count: Int
-        Return:
-        -------
-        :return: training_dataset, test_dataset, training_labels, test_labels
-        :rtype:  numpy.matrix, numpy.matrix, numpy.matrix, numpy.matrix'''
+
+
+def numericalSort(value):
+    numbers = re.compile(r'(\d+)')
+    parts = numbers.split(value)
+    parts[1::2] = map(int, parts[1::2])
+    return parts
+
+
+'''This Function Load Images dataset from a given directory into ndarray
+Parameters:
+-----------
+    dir {string}: Path to dataset
+    train_count {int}: Number of images to load for training 
+    test_count {int}: Number of images to load for testing
+Return:
+    training_dataset{ List[ndarray] }:
+    test_dataset{ List[ndarray] }:'''
+def load(dir='orl_faces', train_count=5, test_count=5):
     try:
         training_dataset = []
         test_dataset = []
         training_label = []
         test_label = []
-        for folder in os.listdir(dir):
+        folders=os.listdir(dir)
+        folders=sorted(folders,key=numericalSort)
+        for folder in folders:
             path = dir + '/' + folder
             if os.path.isdir(path):
-                files = os.listdir(path)
+                files =os.listdir(path)
                 for i in range(0, train_count):
                     training_dataset.append(imread(path + '/' + files[i]).flatten())
                     training_label.append(folder)
@@ -38,3 +46,4 @@ def load(dir='orl_faces', train_count=7, test_count=3):
 
 if __name__ == '__main__':
     train_data, test_data, train_labels, test_labels = load()
+    # numpy.save('Traindata', train_data)
