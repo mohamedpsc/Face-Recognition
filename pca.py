@@ -2,7 +2,7 @@ import numpy
 from sklearn.neighbors import KNeighborsClassifier
 import database_reader as reader
 import logging 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 def deviationMatrix(matrix):
     ones = numpy.ones((1, matrix.shape[0]))
@@ -34,7 +34,6 @@ def pca(matrix, threshold, eigValues=None, eigVectors=None):
 
 def classify(alpha):
     global train_data, test_data, train_labels, test_labels
-    print(test_labels)
     global eigValues, eigVectors
     projection_matrix = pca(train_data, alpha, eigValues, eigVectors)
     projected_data = test_data * projection_matrix
@@ -69,46 +68,5 @@ if __name__ == '__main__':
     proj_mat_095 = pca(train_data, 0.95, eigValues, eigVectors)
 
     # For alpha = 0.8
-    new_train_data = train_data * proj_mat_08
-    new_test_data = test_data * proj_mat_08
-    neigh = KNeighborsClassifier(n_neighbors=1)
-    neigh.fit(new_train_data, train_labels.T)
-    correct = 0
-    for i in range(new_test_data.shape[0]):
-        if test_labels[0, i] == neigh.predict(new_test_data[i]):
-            correct += 1
-    print("Accuracy For 0.8 Alpha: "  + str(correct / new_test_data.shape[0]))
-
-    # For alpha = 0.85
-    new_train_data = train_data * proj_mat_085
-    new_test_data = test_data * proj_mat_085
-    neigh = KNeighborsClassifier(n_neighbors=1)
-    neigh.fit(new_train_data, train_labels.T)
-    correct = 0
-    for i in range(new_test_data.shape[0]):
-        if test_labels[0, i] == neigh.predict(new_test_data[i]):
-            correct += 1
-    print("Accuracy For 0.85 Alpha: " + str(correct / new_test_data.shape[0]))
-
-    # For alpha = 0.9
-    new_train_data = train_data * proj_mat_09
-    new_test_data = test_data * proj_mat_09
-    neigh = KNeighborsClassifier(n_neighbors=1)
-    neigh.fit(new_train_data, train_labels.T)
-    correct = 0
-    for i in range(new_test_data.shape[0]):
-        if test_labels[0, i] == neigh.predict(new_test_data[i]):
-            correct += 1
-    print("Accuracy For 0.9 Alpha: " + str(correct / new_test_data.shape[0]))
-
-    # For alpha = 0.95
-    new_train_data = train_data * proj_mat_095
-    new_test_data = test_data * proj_mat_095
-    neigh = KNeighborsClassifier(n_neighbors=1)
-    neigh.fit(new_train_data, train_labels.T)
-    correct = 0
-    for i in range(new_test_data.shape[0]):
-        if test_labels[0, i] == neigh.predict(new_test_data[i]):
-            correct += 1
-    print("Accuracy For 0.95 Alpha: "  + str(correct / new_test_data.shape[0]))
-
+    for i in [0.8, 0.85, 0.9, 0.95]:
+         print(classify(i))
