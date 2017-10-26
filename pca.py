@@ -25,12 +25,12 @@ def pca(matrix, threshold, eigValues=None, eigVectors=None):
     # Finding Number Of Dimensions To Project Data on
     sum = eigValues.sum()
     num = 0
-    count = eigValues.shape[1]
+    count = eigValues.shape[0]
     while num/sum < threshold:
         count -= 1
-        num += eigValues[0, count]
+        num += eigValues[count]
     # Return Projection Matrix
-    return eigVectors[:, count:eigValues.shape[1]]
+    return eigVectors[:, count:eigValues.shape[0]]
 
 def classify(alpha):
     global train_data, test_data, train_labels, test_labels
@@ -38,9 +38,9 @@ def classify(alpha):
     projection_matrix = pca(train_data, alpha, eigValues, eigVectors)
     projected_data = test_data * projection_matrix
     neigh = KNeighborsClassifier(n_neighbors=1)
-    neigh.fit(train_data * projection_matrix, train_labels.T)
+    neigh.fit(train_data * projection_matrix, train_labels.flat)
     logging.debug(projected_data.shape)
-    return neigh.score(projected_data, test_labels.T)
+    return neigh.score(projected_data, test_labels.flat)
 
 '''
 loading constants 
@@ -48,19 +48,17 @@ loading constants
 train_data, test_data, train_labels, test_labels = reader.load()
 from os import path
 if  path.exists('eigValues.npy') and path.exists('eigVectors.npy'):
-            logging.info("Found eigen...loading...")
-            eigValues = numpy.matrix(numpy.load('eigValues.npy'))
-            eigVectors = numpy.matrix(numpy.load('eigVectors.npy'))
+    logging.info("Found eigen...loading...")
+    eigValues = numpy.load('eigValues.npy')
+    eigVectors = numpy.load('eigVectors.npy')
 else:
-        logging.info("Recomputing eigen..")
-        
-        proj_mat1 = pca(train_data, 0.8)
+    logging.info("Recomputing eigen..")
+    proj_mat08 = pca(train_data, 0.8)
     
 
 if __name__ == '__main__':
     from os import path
     from sys import argv
-
    
     proj_mat_08 = pca(train_data, 0.8, eigValues, eigVectors)
     proj_mat_085 = pca(train_data, 0.85, eigValues, eigVectors)
