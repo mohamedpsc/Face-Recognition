@@ -12,6 +12,7 @@ Parameters:
 Return:
     training_dataset{ List[ndarray] }:
     test_dataset{ List[ndarray] }:'''
+
 def LDA(train_data):
     train_data_divided = np.vsplit(train_data, 40)
     class_mean = np.zeros((40, 10304), np.float64)
@@ -35,18 +36,13 @@ def LDA(train_data):
         temp = np.tile(class_mean[i], (5, 1))
         class_mean_repeated=np.append(class_mean_repeated,temp,0)
     # calculate Z centered matrix
-    mu_=np.zeros((40, 10304),np.float64)
-    # # we will change this limit if we  change number of train cases or test cases
+    # we will change this limit if we  change number of train cases or test cases
     Z_matrix=np.subtract(train_data,class_mean_repeated)
-
+    S_matrix=np.zeros((10304,10304),np.float64)
     for i in range(0,200):
         temp=np.matmul(np.matrix.transpose(Z_matrix[i]),Z_matrix[i])
-
-    print(S_Array,S_Array.shape)
-    # print(S_Array)
-    # for i in range(0,200):
-      # S_matrix+=S_array[i]
-
+        S_matrix+=temp
+    print(S_matrix,S_matrix.shape)
 
 
 
