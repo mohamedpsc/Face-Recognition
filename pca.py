@@ -53,17 +53,13 @@ if  path.exists('eigValues.npy') and path.exists('eigVectors.npy'):
     eigVectors = numpy.load('eigVectors.npy')
 else:
     logging.info("Recomputing eigen..")
-    proj_mat08 = pca(train_data, 0.8)
+    proj_mat_08 = pca(train_data, 0.8)
+    eigValues = numpy.load('eigValues.npy')
+    eigVectors = numpy.load('eigVectors.npy')
     
 
 if __name__ == '__main__':
     from os import path
-    from sys import argv
-   
-    proj_mat_08 = pca(train_data, 0.8, eigValues, eigVectors)
-    proj_mat_085 = pca(train_data, 0.85, eigValues, eigVectors)
-    proj_mat_09 = pca(train_data, 0.9, eigValues, eigVectors)
-    proj_mat_095 = pca(train_data, 0.95, eigValues, eigVectors)
 
     # For alpha = 0.8
     for i in [0.8, 0.85, 0.9, 0.95]:
