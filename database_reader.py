@@ -2,7 +2,7 @@ import os
 from scipy.misc import imread
 import numpy
 
-def load(dir='orl_faces', train_count=7, test_count=3):
+def load(dir='orl_faces', train_count=5, test_count=5):
     '''This Function Load Images dataset from a given directory into numpy.matrix\n
         Args:
         -----
