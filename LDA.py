@@ -1,55 +1,44 @@
 import numpy as np
-from numba import vectorize,cuda
 
 import database_reader
 
-'''This Function Load Images dataset from a given directory into ndarray
-Parameters:
------------
-    train_data {matrix}: training examples dataset
-    train_count {int}: Number of images to load for training 
-    test_count {int}: Number of images to load for testing
-Return:
-    training_dataset{ List[ndarray] }:
-    test_dataset{ List[ndarray] }:'''
-
-def LDA(train_data):
-    train_data_divided = np.vsplit(train_data, 40)
-    class_mean = np.zeros((40, 10304), np.float64)
-    # convert each sub matrix to a matrix and calculate each class mean
-    for i in range(0, 40):
-        class_mean[i] = np.asanyarray(train_data_divided[i]).mean(0)
-    # calculate the total mean mu of all classes
-    all_class_mean = class_mean.mean(0)
+def LDA(train_data, nclasses, spc):
+    """:parameter train_data: training Data set
+    :type train_data: array-like (nd-array, matrix, etc)
+    :parameter nclasses: number of classes included in the given dataset
+    :type nclasses: int
+    :parameter spc: Number of samples given per class
+    :type spc: int"""
+    # Calculate classes means
+    means = np.zeros((nclasses, train_data.shape[1]))
+    for i in range(0, nclasses):
+        means[i] = train_data[i*spc:i*spc+spc, :].mean(0)
+    all_class_mean = means.mean(0)
     # calculate the mu class Sb
-    temp=np.zeros((40, 10304),np.float64)
-    Sb_matrix= np.zeros((10304, 10304), np.float64)
-    for i in range(0,40):
-        temp=np.subtract(class_mean[i,:],all_class_mean)
-        temp=5*np.matmul(temp.T,temp)
-        Sb_matrix+=temp
-    # prepare the mean class matrix
-    class_mean_repeated = np.tile(class_mean[0], (5, 1))
-    for i in range(1,40):
-        # we will change this to handle different training sets
-        temp = np.tile(class_mean[i], (5, 1))
-        class_mean_repeated=np.append(class_mean_repeated,temp,0)
-    # calculate Z centered matrix
-    # we will change this limit if we  change number of train cases or test cases
-    Z_matrix=np.subtract(train_data,class_mean_repeated)
-    S_matrix=np.zeros((10304,10304),np.float64)
-    for i in range(0,200):
-        temp=np.matmul(np.matrix.transpose(Z_matrix[i]),Z_matrix[i])
-        S_matrix+=temp
-    temp=np.matmul(np.linalg.inv(S_matrix),Sb_matrix)
-    W_eigvalue,V_eigvector=np.linalg.eigh(temp)
-    np.save('eigvalue',W_eigvalue)
-    np.save('eigvector',V_eigvector)
-    print(W_eigvalue.sort())
+    sb_matrix = np.zeros((train_data.shape[1], train_data.shape[1]))
+    for i in range(0, nclasses):
+        temp = np.subtract(means[i, :], all_class_mean)
+        temp = spc * np.matmul(temp.T, temp)
+        sb_matrix += temp
+    # Calculate Deviation Matrix (Z)
+    dev_matrix = np.zeros(train_data.shape)
+    index = 0
+    for i in range(0, nclasses):
+        for j in range(0, spc):
+            dev_matrix[index] = train_data[index] - means[i]
+            index += 1
+    # calculate Scatter matrix (S)
+    scatter_matrix = np.dot(dev_matrix[:spc, :].T, dev_matrix[:spc, :])
+    for i in range(nclasses):
+        scatter_matrix += np.dot(dev_matrix[i*spc:i*spc+spc, :].T, dev_matrix[i*spc:i*spc+spc, :])
+    # Calculate eigen values and vevtors
+    eigValues, eigVectors = np.linalg.eigh(np.dot(np.linalg.pinv(scatter_matrix), sb_matrix))
+    np.save('eigvalue', eigVectors)
+    np.save('eigvector', eigValues)
 
 def main():
     train_data, test_data, train_labels, test_labels = database_reader.load()
-    LDA(train_data)
+    LDA(train_data, 40, 5)
 
 
 if __name__=='__main__':
