@@ -2,7 +2,6 @@ import numpy as np
 import database_reader as reader
 from sklearn.neighbors import KNeighborsClassifier
 
-
 def lda(data, nclasses, spc, ndv=None):
     """
     :param data: training Data set
@@ -42,7 +41,6 @@ def lda(data, nclasses, spc, ndv=None):
     if ndv is not None:
         return eigVectors[:, eigVectors.shape[1]-ndv:]
     return eigVectors
-
 
 def lda_classify(nclasses, spc, ndv=None, recompute=False):
     """
