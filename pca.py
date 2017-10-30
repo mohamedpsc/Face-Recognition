@@ -47,15 +47,14 @@ loading constants
 '''
 train_data, test_data, train_labels, test_labels = reader.load()
 from os import path
-if  path.exists('eigValues.npy') and path.exists('eigVectors.npy'):
+if path.exists('eigValues.npy') and path.exists('eigVectors.npy'):
     logging.info("Found eigen...loading...")
     eigValues = numpy.load('eigValues.npy')
     eigVectors = numpy.load('eigVectors.npy')
 else:
     logging.info("Recomputing eigen..")
-    proj_mat_08 = pca(train_data, 0.8)
-    eigValues = numpy.load('eigValues.npy')
-    eigVectors = numpy.load('eigVectors.npy')
+    eigValues = None
+    eigVectors = None
     
 
 if __name__ == '__main__':
