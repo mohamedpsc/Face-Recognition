@@ -1,6 +1,14 @@
 import os
 from scipy.misc import imread
 import numpy
+import re
+
+def numericalSort(value):
+    numbers = re.compile(r'(\d+)')
+    parts = numbers.split(value)
+    parts[1::2] = map(int, parts[1::2])
+    return parts
+
 
 def load(dir='orl_faces', train_count=5):
     '''This Function Load Images dataset from a given directory into numpy.matrix\n
