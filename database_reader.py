@@ -2,7 +2,7 @@ import os
 from scipy.misc import imread
 import numpy
 
-def load(dir='orl_faces', train_count=5, test_count=5):
+def load(dir='orl_faces', train_count=5):
     '''This Function Load Images dataset from a given directory into numpy.matrix\n
         Args:
         -----
@@ -25,16 +25,29 @@ def load(dir='orl_faces', train_count=5, test_count=5):
             path = dir + '/' + folder
             if os.path.isdir(path):
                 files = os.listdir(path)
-                for i in range(0, train_count):
-                    training_dataset.append(imread(path + '/' + files[i]).flatten())
-                    training_label.append(folder)
-                for i in range(train_count, train_count + test_count):
-                    test_dataset.append(imread(path + '/' + files[i]).flatten())
-                    test_label.append(folder)
-    except (NotADirectoryError, IOError, Exception) as e:
+                # assert (len(files) < train_count), "Number of required train samples is larger than the available samples"
+                counter = 0
+                for i in range(1, len(files), 2):
+                    if counter < train_count:
+                        training_dataset.append(imread(path + '/' + files[i]).flatten())
+                        training_label.append(folder)
+                        counter += 1
+                    else:
+                        test_dataset.append(imread(path + '/' + files[i]).flatten())
+                        test_label.append(folder)
+                for i in range(0, len(files), 2):
+                    if counter < train_count:
+                        training_dataset.append(imread(path + '/' + files[i]).flatten())
+                        training_label.append(folder)
+                        counter += 1
+                    else:
+                        test_dataset.append(imread(path + '/' + files[i]).flatten())
+                        test_label.append(folder)
+    except (Exception) as e:
         print(e.strerror)
     else:
         return numpy.asmatrix(training_dataset), numpy.asmatrix(test_dataset), numpy.asmatrix(training_label), numpy.asmatrix(test_label)
 
+
 if __name__ == '__main__':
-    train_data, test_data, train_labels, test_labels = load()
+    train_data, test_data, train_labels, test_labels = load(train_count=7)
