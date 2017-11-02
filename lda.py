@@ -35,9 +35,13 @@ def lda(data, nclasses, spc, ndv=None):
     for i in range(1, nclasses):
         scatter_matrix += np.dot(dev_matrix[i*spc:i*spc+spc, :].T, dev_matrix[i*spc:i*spc+spc, :])
     # Calculate eigen values and vevtors
-    eigValues, eigVectors = np.linalg.eigh(np.dot(np.linalg.pinv(scatter_matrix), sb_matrix))
+    eigValues, eigVectors = np.linalg.eigh(np.dot(np.linalg.inv(scatter_matrix), sb_matrix))
     np.save('lda_eigvector_'+str(spc), eigVectors)
     np.save('lda_eigvalue_'+str(spc), eigValues)
+    # idx = eigValues.argsort()[::-1]
+    # W_eigvalue = eigValues[idx]
+    # V_eigvector = eigVectors[:, idx]
+
     if ndv is not None:
         return eigVectors[:, eigVectors.shape[1]-ndv:]
     return eigVectors
@@ -57,7 +61,7 @@ def lda_classify(nclasses, spc, ndv=None, recompute=False):
     train_data, test_data, train_labels, test_labels = reader.load()
     from os import path
     if path.exists('lda_eigvector_'+str(spc)+'.npy') and not recompute:
-        projection_matrix = np.matrix(np.load('lda_eigvector_'+str(spc)+'.npy'))[:, train_data.shape[1] - ndv:]
+        projection_matrix = np.matrix(np.load('lda_eigvector_'+str(spc)+'.npy'))[:, :ndv]
     else:
         projection_matrix = lda(train_data, nclasses, spc, ndv)
     projected_data = test_data * projection_matrix
