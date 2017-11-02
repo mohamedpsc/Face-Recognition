@@ -99,3 +99,11 @@ ENV/
 
 # mypy
 .mypy_cache/
+cat-dogs-dataset/
+orl_faces/
+eigValues.npy
+eigVectors.npy
+lda_eigvalue_5.npy
+lda_eigvector_5.npy
+*.tar.Z
+*.npy
