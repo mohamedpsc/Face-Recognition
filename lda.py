@@ -3,7 +3,7 @@ import database_reader as reader
 from sklearn.neighbors import KNeighborsClassifier
 
 
-def lda(data, nclasses, spc, ndv=None):
+def lda(data, nclasses, spc):
     """
     :param data: training Data set
     :type data: array-like (nd-array, matrix, etc)
@@ -11,8 +11,7 @@ def lda(data, nclasses, spc, ndv=None):
     :type nclasses: int
     :param spc: Number of samples given per class
     :type spc: int
-    :param ndv: Number of dominant vectors required
-    :type ndv: int"""
+    """
     # Calculate classes means
     means = np.zeros((nclasses, data.shape[1]))
     for i in range(nclasses):
@@ -21,8 +20,8 @@ def lda(data, nclasses, spc, ndv=None):
     # calculate the between class scatter matrix Sb
     sb_matrix = np.zeros((data.shape[1], data.shape[1]))
     for i in range(nclasses):
-        temp = np.subtract(means[i, :], all_class_mean)
-        temp = spc * np.matmul(temp.T, temp)
+        temp = (means[i, :] - all_class_mean)[:, np.newaxis]
+        temp = spc * np.matmul(temp, temp.T)
         sb_matrix += temp
     all_class_mean = None
     # Calculate Deviation Matrix (Z)
@@ -46,9 +45,8 @@ def lda(data, nclasses, spc, ndv=None):
     # eigVectors = eigVectors[:, order]
     np.save('lda_eigvector_'+str(spc), eigVectors)
     np.save('lda_eigvalue_'+str(spc), eigValues)
-    if ndv is not None:
-        return eigVectors[:, data.shape[1]-ndv:]
     return eigVectors
+
 
 def lda_classify(nclasses, spc, ndv=None, recompute=False):
     """
@@ -65,9 +63,9 @@ def lda_classify(nclasses, spc, ndv=None, recompute=False):
     train_data, test_data, train_labels, test_labels = reader.load()
     from os import path
     if path.exists('lda_eigvector_'+str(spc)+'.npy') and not recompute:
-        projection_matrix = np.matrix(np.load('lda_eigvector_'+str(spc)+'.npy'))[:, train_data.shape[1]-ndv:]
+        projection_matrix = np.load('lda_eigvector_'+str(spc)+'.npy')[:, train_data.shape[1]-ndv:]
     else:
-        projection_matrix = lda(train_data, nclasses, spc, ndv)
+        projection_matrix = lda(train_data, nclasses, spc, ndv)[:, train_data.shape[1]-ndv:]
     projected_data = test_data * projection_matrix
     neigh = KNeighborsClassifier(n_neighbors=1)
     neigh.fit(train_data * projection_matrix, train_labels.flat)
