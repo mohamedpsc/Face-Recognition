@@ -66,7 +66,6 @@ def lda_classify(nclasses, spc, ndv=None, recompute=False):
     from os import path
     if path.exists('lda_eigvector_'+str(spc)+'.npy') and not recompute:
         projection_matrix = np.matrix(np.load('lda_eigvector_'+str(spc)+'.npy'))[:, train_data.shape[1]-ndv:]
-        print(np.load('lda_eigvalue_' + str(spc) + '.npy'))
     else:
         projection_matrix = lda(train_data, nclasses, spc, ndv)
     projected_data = test_data * projection_matrix
