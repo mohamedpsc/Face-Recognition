@@ -46,33 +46,46 @@ def load(dir='orl_faces', train_count=5):
     except (Exception) as e:
         print(e.strerror)
     else:
-        return numpy.asmatrix(training_dataset), numpy.asmatrix(test_dataset), numpy.asmatrix(training_label), numpy.asmatrix(test_label)
+        return [numpy.asmatrix(training_dataset), numpy.asmatrix(test_dataset), numpy.asmatrix(training_label), numpy.asmatrix(test_label)]
 
 
 def load_non_human():
-    from os.path import listdir, join
-    animals_dir = "cats-dogs-dataset/train"
+    from os.path import  join
+    from os import listdir
+    from itertools import islice
+    animals_dir = "cat-dogs-dataset/train"
     animal_files = listdir(animals_dir)
-    animals_dir = list(map(
+    animals_files_abs = list(map(
         lambda fname : join(animals_dir, fname),
         animal_files
     ))
+
     animal_imgs = list(
         map(
             preprocessing_data,
-            animal_files
+            animals_files_abs[:200]
         )
     )
-    #TODO construct class for datasets 
-    train.data = numpy.asmatrix(animal_imgs)
-    train.labels = numpy.zeros([1,train.data.shape])
+
+    animals_tests = list(
+        map(
+            preprocessing_data,
+            animals_files_abs[200:400]
+        )
+    )
+    train_labels = numpy.zeros([1,len(animal_imgs)])
+    test_labels = numpy.zeros([1,len(animals_tests)])
+
+    return  [numpy.asmatrix(animal_imgs), numpy.asmatrix(animals_tests), train_labels,test_labels]
     
-    
+import logging
+logging.basicConfig(level=logging.INFO)
 def preprocessing_data(imgname):
     '''gresacling and resizing images'''
+    logging.debug(imgname)
     NEW_RES = (92,112)
     from scipy.misc import imread, imresize
-    img = imread(imgname, mode="LA")
+    img = imread(imgname, mode="L")
     img = imresize(img, NEW_RES)
     return img.flatten()    
 
