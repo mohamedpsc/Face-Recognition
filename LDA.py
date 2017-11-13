@@ -36,10 +36,11 @@ def lda(data, nclasses, spc, ndv=None):
         scatter_matrix += np.dot(dev_matrix[i*spc:i*spc+spc, :].T, dev_matrix[i*spc:i*spc+spc, :])
     # Calculate eigen values and vevtors
     eigValues, eigVectors = np.linalg.eigh(np.dot(np.linalg.pinv(scatter_matrix), sb_matrix))
-    np.save('lda_eigvector_'+str(spc), eigVectors)
-    np.save('lda_eigvalue_'+str(spc), eigValues)
+    print()
+    # np.save('lda_eigvector_'+str(spc), eigVectors)
+    # np.save('lda_eigvalue_'+str(spc), eigValues)
     if ndv is not None:
-        return eigVectors[:, eigVectors.shape[1]-ndv:]
+        return eigVectors[:, :(ndv)]
     return eigVectors
 
 def lda_classify(nclasses, spc, ndv=None, recompute=False):
@@ -65,6 +66,21 @@ def lda_classify(nclasses, spc, ndv=None, recompute=False):
     neigh.fit(train_data * projection_matrix, train_labels.T)
     return neigh.score(projected_data, test_labels.T)
 
+def lda_classy_bonus(spc=100):
+    dl = (reader.load_non_human(spc))
+    d = next(dl)
+    projection_matrix = lda(d, 2, spc,4)
+    knc = KNeighborsClassifier(n_neighbors = 1)
+    knc.fit(
+        d * projection_matrix,
+        next(dl)
+    )
+    del(d) 
+    return knc.score(
+        next(dl) * projection_matrix,
+        next(dl)
+    )
 
 if __name__ == '__main__':
-    print(lda_classify(40, 5, 39))
+    # print(lda_classify(40, 5, 39))
+    print(lda_classy_bonus())
