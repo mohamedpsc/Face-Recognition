@@ -20,7 +20,7 @@ def lda(data, nclasses, spc, ndv=None):
     # calculate the between class scatter matrix Sb
     sb_matrix = np.zeros((data.shape[1], data.shape[1]))
     for i in range(nclasses):
-        temp = np.subtract(means[i, :], all_class_mean)
+        temp = np.subtract(means[i, :], all_class_mean)[:, np.newaxis]
         temp = spc * np.matmul(temp.T, temp)
         sb_matrix += temp
     # Calculate Deviation Matrix (Z)
@@ -37,8 +37,8 @@ def lda(data, nclasses, spc, ndv=None):
     # Calculate eigen values and vevtors
     eigValues, eigVectors = np.linalg.eigh(np.dot(np.linalg.pinv(scatter_matrix), sb_matrix))
     print()
-    # np.save('lda_eigvector_'+str(spc), eigVectors)
-    # np.save('lda_eigvalue_'+str(spc), eigValues)
+    np.save('lda_eigvector_'+str(spc), eigVectors)
+    np.save('lda_eigvalue_'+str(spc), eigValues)
     if ndv is not None:
         return eigVectors[:, :(ndv)]
     return eigVectors
@@ -66,10 +66,15 @@ def lda_classify(nclasses, spc, ndv=None, recompute=False):
     neigh.fit(train_data * projection_matrix, train_labels.T)
     return neigh.score(projected_data, test_labels.T)
 
-def lda_classy_bonus(spc=100):
+def lda_classy_bonus(spc=100,ndv=1, recompute=False):
+    from os import path 
     dl = (reader.load_non_human(spc))
     d = next(dl)
-    projection_matrix = lda(d, 2, spc,4)
+    if path.exists('lda_eigvector_'+str(spc)+'.npy') and not recompute:
+        projection_matrix = np.matrix(np.load('lda_eigvector_'+str(spc)+'.npy'))[:, -ndv:]
+    else:
+        projection_matrix = lda(d, 2, spc,ndv)
+
     knc = KNeighborsClassifier(n_neighbors = 1)
     knc.fit(
         d * projection_matrix,
@@ -83,4 +88,10 @@ def lda_classy_bonus(spc=100):
 
 if __name__ == '__main__':
     # print(lda_classify(40, 5, 39))
-    print(lda_classy_bonus())
+    from sys import argv
+
+    print(lda_classy_bonus(
+        200,
+        int(argv[1]),
+        recompute=True
+        ))

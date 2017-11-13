@@ -20,8 +20,8 @@ def pca(matrix, threshold, eigValues=None, eigVectors=None):
         covMatrix = covariance(devMatrix)
         eigValues, eigVectors = numpy.linalg.eigh(covMatrix)
         # Saving eigen Values and Vectors into Files
-        numpy.save('eigValues', eigValues)
-        numpy.save('eigVectors', eigVectors)
+        # numpy.save('eigValues', eigValues)
+        # numpy.save('eigVectors', eigVectors)
     # Finding Number Of Dimensions To Project Data on
     sum = eigValues.sum()
     num = 0
@@ -37,6 +37,7 @@ def classify(alpha):
     global eigValues, eigVectors
     projection_matrix = pca(train_data, alpha, eigValues, eigVectors)
     projected_data = test_data * projection_matrix
+    print(projection_matrix.shape)
     neigh = KNeighborsClassifier(n_neighbors=1)
     neigh.fit(train_data * projection_matrix, train_labels.flat)
     logging.debug(projected_data.shape)
@@ -45,17 +46,19 @@ def classify(alpha):
 '''
 loading constants 
 '''
-train_data, test_data, train_labels, test_labels = reader.load()
+train_data, train_labels, test_data, test_labels = reader.load_non_human(100)
+
 from os import path
-if path.exists('eigValues.npy') and path.exists('eigVectors.npy'):
-    logging.info("Found eigen...loading...")
-    eigValues = numpy.load('eigValues.npy')
-    eigVectors = numpy.load('eigVectors.npy')
-else:
-    logging.info("Recomputing eigen..")
-    eigValues = None
-    eigVectors = None
-    
+# if path.exists('eigValues.npy') and path.exists('eigVectors.npy'):
+#     logging.info("Found eigen...loading...")
+#     eigValues = numpy.load('eigValues.npy')
+#     eigVectors = numpy.load('eigVectors.npy')
+# else:
+
+logging.info("Recomputing eigen..")
+eigValues = None
+eigVectors = None
+
 
 if __name__ == '__main__':
     from os import path
