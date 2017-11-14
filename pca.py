@@ -48,7 +48,7 @@ def dominant_vectors(eig_values, threshold):
         num += eig_values[count]
         if num / total > threshold:
             return count + 1
-    return eig_values.shape[0]
+    return count
 
 
 def pca(data, threshold, spc, save=False):
