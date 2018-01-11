@@ -139,9 +139,9 @@ def lda_classify(n_classes, spc, ndv=0, data_path='orl_faces', recompute=False):
     train_data, test_data, train_labels, test_labels = reader.load(dir=data_path, train_count=spc)
     from os import path
     if path.exists('lda_eigvector_'+str(spc)+'.npy') and not recompute:
-        projection_matrix = np.load('lda_eigvector_'+str(spc)+'.npy')[:, -ndv:]
+        projection_matrix = np.load('lda_eigvector_'+str(spc)+'.npy')[::-1][:, :ndv]
     else:
-        projection_matrix = lda(train_data, n_classes, spc, save=True)[:, -ndv:]
+        projection_matrix = lda(train_data, n_classes, spc, save=True)[::-1][:, :ndv]
     projected_data = test_data * projection_matrix
     neigh = KNeighborsClassifier(n_neighbors=1)
     neigh.fit(train_data * projection_matrix, train_labels.flat)
